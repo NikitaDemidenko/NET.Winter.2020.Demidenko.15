@@ -26,11 +26,16 @@ namespace PseudoEnumerableClassTask
                 throw new ArgumentNullException($"{nameof(predicate)} cannot be null.");
             }
 
-            foreach (var item in source)
+            return FilterByIterator(source, predicate);
+
+            static IEnumerable<TSource> FilterByIterator(IEnumerable<TSource> source, IPredicate<TSource> predicate)
             {
-                if (predicate.IsMatch(item))
+                foreach (var item in source)
                 {
-                    yield return item;
+                    if (predicate.IsMatch(item))
+                    {
+                        yield return item;
+                    }
                 }
             }
         }
@@ -74,12 +79,16 @@ namespace PseudoEnumerableClassTask
                 throw new ArgumentNullException(nameof(comparer));
             }
 
-            var array = source.ToArray();
+            return OrderAccordingToIterator(source, comparer);
 
-            Array.Sort(array, comparer);
-            foreach (var item in array)
+            static IEnumerable<TSource> OrderAccordingToIterator(IEnumerable<TSource> source, System.Collections.Generic.IComparer<TSource> comparer)
             {
-                yield return item;
+                var array = source.ToArray();
+                Array.Sort(array, comparer);
+                foreach (var item in array)
+                {
+                    yield return item;
+                }
             }
         }
 
@@ -145,9 +154,14 @@ namespace PseudoEnumerableClassTask
                 throw new ArgumentNullException($"{nameof(transformer)} cannot be null.");
             }
 
-            foreach (var item in source)
+            return TransformIterator(source, transformer);
+
+            static IEnumerable<TResult> TransformIterator(IEnumerable<TSource> source, Converter<TSource, TResult> transformer)
             {
-                yield return transformer(item);
+                foreach (var item in source)
+                {
+                    yield return transformer(item);
+                }
             }
         }
 
@@ -163,11 +177,16 @@ namespace PseudoEnumerableClassTask
                 throw new ArgumentNullException(nameof(source));
             }
 
-            foreach (var item in source)
+            return TypeOfIterator(source);
+
+            static IEnumerable<TResult> TypeOfIterator(IEnumerable source)
             {
-                if (item.GetType() == typeof(TResult))
+                foreach (var item in source)
                 {
-                    yield return (TResult)item;
+                    if (item.GetType() == typeof(TResult))
+                    {
+                        yield return (TResult)item;
+                    }
                 }
             }
         }
@@ -199,20 +218,25 @@ namespace PseudoEnumerableClassTask
                 throw new ArgumentNullException(nameof(source));
             }
 
-            int count = 0;
-            foreach (var item in source)
-            {
-                count++;
-            }
+            return ToArrayIterator(source);
 
-            var array = new T[count];
-            int i = 0;
-            foreach (var item in source)
+            static T[] ToArrayIterator(IEnumerable<T> source)
             {
-                array[i++] = item;
-            }
+                int count = 0;
+                foreach (var item in source)
+                {
+                    count++;
+                }
 
-            return array;
+                var array = new T[count];
+                int i = 0;
+                foreach (var item in source)
+                {
+                    array[i++] = item;
+                }
+
+                return array;
+            }
         }
     }
 }
