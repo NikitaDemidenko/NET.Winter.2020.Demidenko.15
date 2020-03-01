@@ -183,7 +183,7 @@ namespace PseudoEnumerableClassTask
             {
                 foreach (var item in source)
                 {
-                    if (item.GetType() == typeof(TResult))
+                    if (item is TResult)
                     {
                         yield return (TResult)item;
                     }
